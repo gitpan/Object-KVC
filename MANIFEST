@@ -1,0 +1,15 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Hash.t
+t/HashRef.t
+t/List.t
+t/Set.t
+t/String.t
+lib/Object/KVC.pm
+lib/Object/KVC/Hash.pm
+lib/Object/KVC/HashRef.pm
+lib/Object/KVC/List.pm
+lib/Object/KVC/Set.pm
+lib/Object/KVC/String.pm
