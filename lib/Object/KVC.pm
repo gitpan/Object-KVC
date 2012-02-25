@@ -5,11 +5,12 @@ use strict;
 use warnings;
 use Object::KVC::Hash;
 use Object::KVC::HashRef;
+use Object::KVC::Integer;
 use Object::KVC::List;
 use Object::KVC::Set;
 use Object::KVC::String;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 __END__
 

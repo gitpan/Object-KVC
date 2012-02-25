@@ -4,7 +4,7 @@ use 5.008008;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub new {
 	my ( $class, $string ) = @_;
@@ -69,14 +69,14 @@ Object::KVC::String - String wrapper class
   my $string_1 = Object::KVC::String->new("some string");
   my $string_2 = Object::KVC::String->new("some string");
 
-  print $string_1->as_string();;
+  print $string_1->as_string();
 
   $string_1->equals( $string_2 ) ? print "Yes, the objects are equal";
 
 =head1 DESCRIPTION
 
 Object::KVC::String is a string wrapper class for use as a value
-in a Object::KVC::Hash object.
+in an Object::KVC::Hash object.
 
 =head1 METHODS
 
@@ -84,23 +84,23 @@ in a Object::KVC::Hash object.
 
 The constructor.
 
-   my $object = Object::KVC::Hash->new();
+   my $object = Object::KVC::String->new();
 
 No arguments.
 
-=head2 equals( <Object::KVC::Hash> )
+=head2 equals( <Object::KVC::String> )
 
 Returns true if the wrapped strings are 'eq'
 
   $string_1->equals( $string_2 );
 
-=head2 contains( <Object::KVC::Hash> )
+=head2 contains( <Object::KVC::String> )
 
 Returns true if the wrapped strings are 'eq'
 
   $string_1->contains( $string_2 );
 
-=head2 intersects( <Object::KVC::Hash> )
+=head2 intersects( <Object::KVC::String> )
 
 Returns true if the wrapped strings are 'eq'
 
