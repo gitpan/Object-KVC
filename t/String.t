@@ -1,14 +1,17 @@
 use strict;
 use warnings;
 
-use Test::Simple tests => 4;
+use Test::Simple tests => 5;
 
 use Object::KVC::String;
 
-my $s1 = Object::KVC::String->new("x");
+my $s1 = Object::KVC::String->new(" x");
 my $s2 = Object::KVC::String->new("x");
 my $s3 = Object::KVC::String->new("y");
-my $s4 = Object::KVC::String->new("z");
+
+eval { my $s4 = Object::KVC::String->new(); };
+
+ok ( $@ =~ /string required/, "null input" );
 
 ok( $s1->equals($s2), "equals" );
 

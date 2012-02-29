@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub new {
 	my ($class) = @_;
@@ -172,25 +172,25 @@ Returns 'ARRAY' of the Object::KVC::Hash container elements.
 
 =head2 matches( $search<Object::KVC::Hash>, $result<Object::KVC::List> )
 
-Stores all objects which match $search in $result.
+Store all objects which match $search in $result.
 
   $container->matches( $search, $result );
 
 =head2 contains( $search<Object::KVC::Hash>, $result<Object::KVC::List> )
 
-Stores all objects which contain $search in $result.
+Store all objects which contain $search in $result.
 
   $container->contains( $search, $result );
 
 =head2 contained_by( $search<Object::KVC::Hash>, $result<Object::KVC::List> )
 
-Stores all objects which are contained by $search in $result.
+Store all objects which are contained by $search in $result.
 
   $container->contained_by( $search, $result );
 
 =head2 search( $search<Object::KVC::Hash>, $result<Object::KVC::List> )
 
-Stores all objects which match, contain or are contained by $search in $result.
+Store all objects which match, contain or are contained by $search in $result.
 
 Applies matches, contains, and contained_by in order.
 

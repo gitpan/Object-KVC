@@ -10,13 +10,13 @@ use Object::KVC::List;
 use Object::KVC::Set;
 use Object::KVC::String;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 __END__
 
 =head1 NAME
 
-Object::KVC - Simple Key Value Coding
+Object::KVC - Searchable Key Value Coding
 
 =head1 SYNOPSIS
 
@@ -59,14 +59,22 @@ Object::KVC - Simple Key Value Coding
 =head1 DESCRIPTION
 
 Key Value Coding uses a hash key instead of an accessor method to 
-access the values of an object.
+access the values of an object. Key Value Coding is generic; it 
+allows a variety of objects to be modeled without having to write
+a large number of classes.
 
-Values must be wrapped in an object supporting the "equals,"
-"contains," and "intersects" methods in order to allow two 
-Object::KVC::Hash objects to be compared.
+The Object::KVC classes are built to allow simple SQL-like searches
+and manipulation of "schema-free" data.
 
-The "equals," "contains," and "intersects" methods allow searching
-of Object::KVC::Hash objects within an Object::KVC::List.
+The Object::KVC::Hash class values must be wrapped in an object 
+supporting the "equals," "contains," and "intersects" methods in 
+order to allow two Object::KVC::Hash objects to be compared.
+
+The Object::KVC::Hash search methods are used by the Object::KVC::List
+container class to implement the search functionality.
+
+The actual implementation of the value wrapper class search methods
+effectively customizes the actual search behaviour. 
 
 =head1 COPYRIGHT AND LICENSE
 

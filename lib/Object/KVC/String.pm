@@ -3,45 +3,31 @@ package Object::KVC::String;
 use 5.008008;
 use strict;
 use warnings;
+use Carp;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub new {
 	my ( $class, $string ) = @_;
 
-	my $self = {
-		STRING => "0xFFFFFFFF",   #Default value
-	};
-	bless( $self, $class );
+	confess "string required"
+	  unless defined($string);
 
-	$self->_init($string) if defined($string);
+	$string =~ s/^\s+|\s+$//;
+
+	my $self = { STRING => $string };
+	bless( $self, $class );
 
 	return $self;
 }
 
-sub _init {
-	my ( $self, $string ) = @_;
-
-	$string =~ s/^\s+//;
-	$string =~ s/\s+$//;
-
-	$self->{STRING} = $string;
-}
-
-sub as_string {
-	return $_[0]->{STRING};
-}
+sub as_string { return $_[0]->{STRING}; }
 
 sub equals {
 	my ( $self, $other ) = @_;
 
 	if ( $other->isa('Object::KVC::String') ) {
-
-		if ( $other->as_string() eq "0xFFFFFFFF" ) {
-			return 1;
-		}
-	
-		return ( $self->as_string() eq $other->as_string() );
+		return $self->as_string() eq $other->as_string();
 	}
 }
 
@@ -84,9 +70,10 @@ in an Object::KVC::Hash object.
 
 The constructor.
 
-   my $object = Object::KVC::String->new();
+   my $object = Object::KVC::String->new( "string" );
 
-No arguments.
+String to be wrapped must be provided as an argument. Leading and trailing
+whitespace is stripped.
 
 =head2 equals( <Object::KVC::String> )
 

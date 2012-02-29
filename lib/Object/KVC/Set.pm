@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub new {
 	my ( $class ) = @_;
@@ -21,7 +21,7 @@ sub add {
 	confess "invalid object $object"
 	  unless ( $object->can('equals') && $object->can('contains') );
 
-	push @$self, $object;
+	push @{$self}, $object;
 }
 
 sub first {
@@ -113,7 +113,10 @@ sub includes {
 	}
 
 	foreach my $s ( $self->iter() ) {
-		return 1 if ( $s->equals($other) );
+
+		if ( $s->equals($other) ) {
+			return 1;
+		}
 	}
 }
 

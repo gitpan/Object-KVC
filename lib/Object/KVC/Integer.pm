@@ -5,45 +5,34 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub new {
 	my ( $class, $number ) = @_;
 
-	confess "integer required" if ( !defined($number) );
+	confess "integer required" 
+	  unless defined($number);
 
-	my $self = {};
-	bless( $self, $class );
-
-	$self->_init($number);
-
-	return $self;
-}
-
-sub _init {
-	my ( $self, $number ) = @_;
-
-	$number =~ s/^\s+//;
-	$number =~ s/\s+$//;
+	$number =~ s/^\s+|\s+$//g;
 
 	confess "not an integer"
 	  unless ( $number =~ /^\d+$/ );
 
-	$self->{INTEGER} = $number;
+	my $self = { INTEGER => $number };
+	bless( $self, $class );
+
+	return $self;
 }
 
 sub number { return $_[0]->{INTEGER}; }
 
-sub as_string {
-	return $_[0]->{INTEGER};
-}
+sub as_string { return $_[0]->{INTEGER}; }
 
 sub equals {
 	my ( $self, $other ) = @_;
 
 	if ( $other->isa('Object::KVC::Integer') ) {
-
-		return ( $self->as_string() == $other->as_string() );
+		return $self->number() == $other->number();
 	}
 }
 
@@ -59,10 +48,9 @@ sub intersects {
 
 sub gt {
 	my ( $self, $other ) = @_;
-	
-	if ( $other->isa('Object::KVC::Integer') ) {
 
-		return $self->as_string() > $other->as_string();
+	if ( $other->isa('Object::KVC::Integer') ) {
+		return $self->number() > $other->number();
 	}
 }
 
@@ -70,8 +58,7 @@ sub lt {
 	my ( $self, $other ) = @_;
 
 	if ( $other->isa('Object::KVC::Integer') ) {
-
-		return $self->as_string() < $other->as_string();
+		return $self->number() < $other->number();
 	}
 }
 
@@ -88,7 +75,7 @@ __END__
 
 =head1 NAME
 
-Object::KVC::Integer - String wrapper class
+Object::KVC::Integer - Integer wrapper class
 
 =head1 SYNOPSIS
 
@@ -112,9 +99,10 @@ in a Object::KVC::Hash object.
 
 The constructor.
 
-   my $object = Object::KVC::Integer->new();
+   my $object = Object::KVC::Integer->new( 345 );
 
-No arguments.
+Integer to be wrapped must be provided as an argument. Leading and trailing
+whitespace is stripped.
 
 =head2 equals( <Object::KVC::Integer> )
 
@@ -148,13 +136,13 @@ Returns true if this integer object is '<' other
 
 =head2 incr( <Object::KVC::Integer> )
 
-Add 1 to the number, is '++'
+Add 1 to the integer. '++'
 
   $integer_1->incr();
 
 =head2 decr( <Object::KVC::Integer> )
 
-Subtract 1 from the number is '--'
+Subtract 1 from the integer. '--'
 
   $integer_1->decr();
 

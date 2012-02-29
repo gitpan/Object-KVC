@@ -5,11 +5,11 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub new {
 	my ( $class ) = @_;
-	carp "constructor arguments not required; use 'set'"
+	carp "constructor arguments not supported; use 'set'"
 	  if ( scalar(@_) > 1 ); 
 	return bless {}, $class;
 }
@@ -37,7 +37,7 @@ sub get {
 		return $self->{$key};
 	}
 	else {
-		confess $self->dump()," undefined key $key. use 'has_defined' to
+		confess $self->dump(),"\n undefined key $key. use 'has_defined' to
 		  check for the existance of a key/value pair";
 	}
 }
@@ -79,7 +79,7 @@ sub matches {
 			if ( !defined( $self->{$key} ) ) {
 				return undef;
 			}
-			if ( !( $self->{$key}->equals($other->{$key}) ) ) {
+			if ( ! $self->{$key}->equals($other->{$key} ) ) {
 				return undef;
 			}
 		}
@@ -96,7 +96,7 @@ sub intersects {
 			if ( !defined( $self->{$key} ) ) {
 				return undef;
 			}
-			if ( !( $self->{$key}->intersects( $other->{$key} ) ) ) {
+			if ( ! $self->{$key}->intersects( $other->{$key} ) ) {
 				return undef;
 			}
 		}
@@ -114,7 +114,7 @@ sub contains {
 			if ( !defined( $self->{$key} ) ) {
 				return undef;
 			}
-			if ( !( $self->{$key}->contains( $other->{$key} ) ) ) {
+			if ( ! $self->{$key}->contains( $other->{$key} ) ) {
 				return undef;
 			}
 		}
@@ -132,23 +132,13 @@ sub contained_by {
 			if ( !defined( $self->{$key} ) ) {
 				return undef;
 			}
-			if ( !( $other->{$key}->contains( $self->{$key} ) ) ) {
+			if ( ! $other->{$key}->contains( $self->{$key} ) ) {
 				return undef;
 			}
 		}
 	
 		return 1;
 	}
-}
-
-sub as_string {
-	my ($self) = @_;
-	#carp "called as_string on Object::KVC::Hash";
-	my $string;
-	foreach my $key  ( sort keys %$self ) {
-		$string .= $key . " => " . $self->get($key)->as_string() . " ";
-	}
-	return $string;
 }
 
 sub clone {
@@ -160,14 +150,24 @@ sub clone {
 	return $clone;
 }
 
-sub dump {
+sub as_string {
 	my ($self) = @_;
-	my $string = sprintf "%s\n", $self;
-	foreach my $key ( keys %$self ) {
-		$string .= $key . " " . $self->get($key)->as_string() . " ";
-		$string .= ref( $self->get($key) ) . "\n";
+	#carp "called as_string on Object::KVC::Hash";
+	my $string;
+	foreach my $key  ( sort keys %$self ) {
+		$string .= $key . " => " . $self->get($key) . " ";
 	}
 	return $string;
+}
+
+sub dump {
+	my ($self) = @_;
+	my $string;
+	foreach my $key  ( sort keys %$self ) {
+		$string .= $key . " => " . $self->get($key) . "\n";
+	}
+	return $string;
+
 }
 
 
@@ -203,8 +203,8 @@ Values must be wrapped in an object supporting the "equals,"
 "contains," and "intersects" methods in order to allow two 
 Object::KVC::Hash objects to be compared.
 
-The "equals" and "contains" methods allow searching of Object::KVC::Hash
-objects within an Object::KVC::List.
+The "equals," "contains," and "intersects" methods allow searching
+of Object::KVC::Hash objects within an Object::KVC::List.
 
 =head1 METHODS
 

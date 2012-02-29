@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::Simple tests => 9;
+use Test::Simple tests => 11;
 
 use Object::KVC::Integer;
 
@@ -32,3 +32,10 @@ $i1->decr();
 
 ok ( $i1->number() == 1, "decr");
 
+eval { my $i4 = Object::KVC::Integer->new("string"); };
+
+ok ( $@ =~ /not an integer/, "string");
+
+eval { my $i4 = Object::KVC::Integer->new(); };
+
+ok ( $@ =~ /integer required/, "null");

@@ -4,3 +4,8 @@
 0.02 - February 2012
 	- String documentation fix
 	- Integer wrapper class
+	
+0.03 - February 2012
+	- Documentation updates/fixes
+	- Removed String default behaviour
+	- ::String and ::Integer constructor tweak and bad input testing
