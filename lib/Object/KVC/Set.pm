@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub new {
 	my ( $class ) = @_;
@@ -15,17 +15,13 @@ sub new {
 sub add {
 	my ( $self, $object ) = @_;
 
-	confess "object required"
+	croak "Object::KVC::Hash object required"
 	  unless ( defined $object );
 
-	confess "invalid object $object"
-	  unless ( $object->can('equals') && $object->can('contains') );
+	croak "Object::KVC::Hash object required"
+	  unless ( $object->isa('Object::KVC::Hash') );
 
 	push @{$self}, $object;
-}
-
-sub first {
-	return $_[0]->[0];
 }
 
 sub size {
@@ -34,10 +30,6 @@ sub size {
 
 sub iter {
 	return @{ $_[0] };
-}
-
-sub list {
-	return $_[0];
 }
 
 sub equals {
@@ -50,7 +42,7 @@ sub equals {
 		}
 
 		foreach my $s ( $self->iter() ) {
-			my $match = 0;
+			my $match;
 			foreach my $o ( $other->iter() ) {
 				if ( $s->equals($o) ) {
 					$match = 1;
@@ -70,52 +62,53 @@ sub contains {
 
 	if ( $other->isa(__PACKAGE__) ) {
 		
-		#is every object in the other set contained
-		#by something in this set?
 		foreach my $o ( $other->iter() ) {
-			my $match;
-			
+			my $contained;
 			foreach my $s ( $self->iter() ) {
-	
 				if ( $s->contains($o) ) {
-					$match = 1;
+					$contained = 1;
 					last;
 				}
 			}
-			if ( !$match ) {
+			if ( !$contained ) {
+				return undef;
+			}
+		}
+		return 1;
+	}
+	
+	if ( $other->isa('Object::KVC::Hash') ) {
+		foreach my $s ( $self->iter() ) {
+			return 1 if ( $s->contains($other) );
+		}
+	}
+}
+
+sub includes {
+	my ( $self, $other ) = @_;
+
+	if ( $other->isa(__PACKAGE__) ) {
+
+		foreach my $o ( $other->iter() ) {
+			my $included;
+			foreach my $s ( $self->iter() ) {
+				if ( $s->matches($o) ) {
+					$included = 1;
+					last;
+				}
+			}
+			if ( !$included ) {
 				return undef;
 			}
 		}
 		return 1;
 	}
 
-	foreach my $s ( $self->iter() ) {
-		return 1 if ( $s->contains($other) );
-	}
-
-	return 0;
-}
-
-#string version of contains
-sub includes {
-	my ( $self, $other ) = @_;
-
-	#is the other Set a subset of this Set?
-	if ( $other->isa(__PACKAGE__) ) {
-
-		if ( $other->size() > $self->size() ) {
-			return undef;
-		}
-
-		my $isect = $self->intersection($other);
-
-		return $isect->size() == $other->size();
-	}
-
-	foreach my $s ( $self->iter() ) {
-
-		if ( $s->equals($other) ) {
-			return 1;
+	if ( $other->isa('Object::KVC::Hash') ) {
+		foreach my $s ( $self->iter() ) {
+			if ( $s->matches($other) ) {
+				return 1;
+			}
 		}
 	}
 }
@@ -135,7 +128,7 @@ sub intersection {
 
 	foreach my $s ( $self->iter() ) {
 		foreach my $o ( $other->iter() ) {
-			if ( $s->equals($o) ) {
+			if ( $s->matches($o) ) {
 				$isect->add($s);
 				last;
 			}
@@ -162,6 +155,7 @@ sub union {
 			$union->add($o);
 		}
 	}
+
 	return $union;
 }
 
@@ -180,7 +174,14 @@ sub difference {
 	my $diff = __PACKAGE__->new();
 
 	foreach my $s ( $self->iter() ) {
-		if ( !$other->contains($s) ) {
+		my $in_other;
+		foreach my $o ( $other->iter() ) {
+			if ( $s->matches( $o ) ) {
+				$in_other = 1;
+				last;
+			}
+		}
+		if ( !$in_other ) {
 			$diff->add($s);
 		}
 	}
@@ -225,14 +226,13 @@ Object::KVC::Set - Set calculations on Object::KVC::Hash objects
   my $intersection = $set1->intersection($set2);
 
   foreach my $object ( $intersection->iter() ) {
-      print $object->get("last_name")->as_string() if ( $object->has_defined("last_name") );
+      print $object->get("id")->as_string() if ( $object->has_defined("id") );
       print "\n";
   }
 
 =head1 DESCRIPTION
 
-List based Set calculations on a set of Object::KVC::Hash objects
-or any objects which implement 'equals' and 'contains' methods.
+List based Set calculations on a set of Object::KVC::Hash objects.
 
 =head1 METHODS
 
@@ -246,7 +246,7 @@ No arguments.
    
 =head2 add( <object> )
 
-Add a new object which has 'equals' and 'contains' methods to the Set.
+Add a new Object::KVC::Hash object to the Set.
 
   $set->add( $object ); 
 
@@ -269,27 +269,27 @@ in this Set has an equal object in the other Set.
 
   $set1->equals($set2);
 
-=head2 contains( $set<Object::KVC::Set> or $other<object> )
+=head2 contains( $set<Object::KVC::Set> or $object<Object::KVC::Hash> )
 
-Returns true if objects in this Set contain every object in the
+Returns true if objects in this Set 'contains' every object in the
 other Set.
 
   $set1->contains( $set2 );
 
-Returns true if an object in this Set contains the other object.
+Returns true if an object in this Set 'contains' the other object.
 
   $set1->contains( $object );
 
-=head2 includes( $set<Object::KVC::Set> or $other<object> )
+=head2 includes( $set<Object::KVC::Set> or $other<Object::KVC::Hash> )
 
-Returns true if objects in this Set equals every object in the
+Returns true if objects in this Set 'matches' every object in the
 other Set.
 
   $set1->includes( $set2 );
 
-Returns true if an object in this Set equals the other object.
+Returns true if an object in this Set 'matches' the other object.
 
-  $set1->includes( $other );
+  $set1->includes( $object );
 
 =head2 difference( $set<Object::KVC::Set> )
  

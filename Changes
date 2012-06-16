@@ -9,3 +9,11 @@
 	- Documentation updates/fixes
 	- Removed String default behaviour
 	- ::String and ::Integer constructor tweak and bad input testing
+
+0.04 - June 2012
+	- Added ::Index module and tests
+    - ::Set requires "Object::KVC::Hash" members
+    - ::Set removed 'first' and 'list' methods
+    - ::String and ::Integer to bless 'SCALAR' ref
+    - ::Hash clone bug fix
+    - 'intersects' tests

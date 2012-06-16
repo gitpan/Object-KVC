@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::Simple tests => 11;
+use Test::Simple tests => 13;
 
 use Object::KVC::Integer;
 
@@ -39,3 +39,11 @@ ok ( $@ =~ /not an integer/, "string");
 eval { my $i4 = Object::KVC::Integer->new(); };
 
 ok ( $@ =~ /integer required/, "null");
+
+my $i5 = Object::KVC::Integer->new("31");
+
+my $i6 = Object::KVC::Integer->new("11");
+
+ok ( $i1->intersects($i2), "intersects");
+
+ok ( ! $i5->intersects($i6), "!intersects");

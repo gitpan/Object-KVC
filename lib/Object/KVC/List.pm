@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub new {
 	my ($class) = @_;
@@ -15,7 +15,7 @@ sub new {
 sub add {
 	my ( $self, $object ) = @_;
 
-	carp "Object::KVC::List::Entry object required"
+	croak "Object::KVC::Hash object required"
 	  unless ( $object->isa('Object::KVC::Hash') );
 
 	push @$self, $object;
@@ -26,7 +26,7 @@ sub iter {
 }
 
 sub size {
-	return scalar( $_[0]->iter() );
+	return scalar( @{ $_[0] } );
 }
 
 sub clone {
@@ -71,6 +71,16 @@ sub contained_by {
 	}
 }
 
+sub intersects {
+	my ( $self, $other, $result ) = @_;
+
+	foreach my $object ( $self->iter() ) {
+		if ( $object->intersects($other) ) {
+			$result->add($object);
+		}
+	}
+}
+
 sub search {
 	my ( $self, $other, $result ) = @_;
 
@@ -84,6 +94,9 @@ sub search {
 		elsif ( $object->contained_by($other) ) {
 			$result->add($object);
 		}
+		elsif ( $object->intersects($other) ) {
+			$result->add($object);
+		}
 	}
 }
 
@@ -95,6 +108,13 @@ sub _validate {
 
 	confess "container for result required"
 	  unless ( defined $result );
+
+	confess "the search object must be an Object::KVC::Hash or Object::KVC::HashRef"
+	  unless ( $other->isa("Object::KVC::Hash") );
+	  
+	confess "the result container must be an Object::KVC::List or Object::KVC::Set"
+	  unless ( $result->isa("Object::KVC::List") || $result->isa("Object::KVC::Set") );
+	  
 }
 1;
 
@@ -190,9 +210,11 @@ Store all objects which are contained by $search in $result.
 
 =head2 search( $search<Object::KVC::Hash>, $result<Object::KVC::List> )
 
-Store all objects which match, contain or are contained by $search in $result.
+Store all objects which match, contain, are contained by, or intersect
+$search in $result.
 
-Applies matches, contains, and contained_by in order.
+Applies matches, contains, contained_by, and intersects methods in that
+order.
 
   $container->search( $search, $result );
 

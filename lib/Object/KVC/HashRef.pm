@@ -4,7 +4,7 @@ use 5.008008;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Object::KVC::Hash;
 our @ISA = qw(Object::KVC::Hash);
@@ -14,9 +14,8 @@ __END__
 
 =head1 NAME
 
-Object::KVC::HashRef - An Object::KVC::HashRef object refers to
-                       one or more Object::KVC::Hash objects
-                       within a Object::KVC::List
+Object::KVC::HashRef - Refers to one or more Object::KVC::Hash objects
+                       in the same Object::KVC::List
 
 =head1 SYNOPSIS
 
@@ -31,7 +30,7 @@ Object::KVC::HashRef - An Object::KVC::HashRef object refers to
 =head1 DESCRIPTION
 
 An Object::KVC::HashRef object refers to one or more
-Object::KVC::Hash objects within a Object::KVC::List.
+Object::KVC::Hash objects in the same Object::KVC::List.
 
 Object::KVC::HashRef inherits from Object::KVC::Hash. 
 

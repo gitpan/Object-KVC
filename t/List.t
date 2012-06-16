@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::Simple tests => 4;
+use Test::Simple tests => 5;
 
 use Object::KVC::List;
 use Object::KVC::Hash;
@@ -51,3 +51,7 @@ $search_result = Object::KVC::List->new();
 $container->search($search, $search_result);
 
 ok ( scalar( $search_result->iter() ) == 1, "search" );
+
+my $clone = $container->clone();
+
+ok ( $clone->size() == $container->size() && ($clone ne $container), "clone");

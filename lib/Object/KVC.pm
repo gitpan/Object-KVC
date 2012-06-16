@@ -5,12 +5,13 @@ use strict;
 use warnings;
 use Object::KVC::Hash;
 use Object::KVC::HashRef;
+use Object::KVC::Index;
 use Object::KVC::Integer;
 use Object::KVC::List;
 use Object::KVC::Set;
 use Object::KVC::String;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 __END__
 
@@ -58,13 +59,15 @@ Object::KVC - Searchable Key Value Coding
 
 =head1 DESCRIPTION
 
+Searchable Key Value Coding is built to add object search
+capability to existing Perl data types.  The Object::KVC classes 
+enable simple SQL-like searches and manipulation of
+"schema-free" data.
+
 Key Value Coding uses a hash key instead of an accessor method to 
 access the values of an object. Key Value Coding is generic; it 
-allows a variety of objects to be modeled without having to write
+allows a variety of objects to be modelled without having to write
 a large number of classes.
-
-The Object::KVC classes are built to allow simple SQL-like searches
-and manipulation of "schema-free" data.
 
 The Object::KVC::Hash class values must be wrapped in an object 
 supporting the "equals," "contains," and "intersects" methods in 

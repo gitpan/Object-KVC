@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub new {
 	my ( $class, $number ) = @_;
@@ -18,15 +18,12 @@ sub new {
 	confess "not an integer"
 	  unless ( $number =~ /^\d+$/ );
 
-	my $self = { INTEGER => $number };
-	bless( $self, $class );
-
-	return $self;
+	return bless( \$number, $class );
 }
 
-sub number { return $_[0]->{INTEGER}; }
+sub number { return ${$_[0]} }
 
-sub as_string { return $_[0]->{INTEGER}; }
+sub as_string { return ${$_[0]} }
 
 sub equals {
 	my ( $self, $other ) = @_;
@@ -63,11 +60,11 @@ sub lt {
 }
 
 sub incr {
-	$_[0]->{INTEGER}++;
+	${$_[0]}++;
 }
 
 sub decr {
-	$_[0]->{INTEGER}--;
+	${$_[0]}--;
 }
 
 1;
@@ -95,11 +92,11 @@ in a Object::KVC::Hash object.
 
 =head1 METHODS
 
-=head2 new()
+=head2 new( integer )
 
 The constructor.
 
-   my $object = Object::KVC::Integer->new( 345 );
+   my $integer = Object::KVC::Integer->new( 345 );
 
 Integer to be wrapped must be provided as an argument. Leading and trailing
 whitespace is stripped.

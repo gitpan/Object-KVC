@@ -5,12 +5,14 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub new {
 	my ( $class ) = @_;
+
 	carp "constructor arguments not supported; use 'set'"
 	  if ( scalar(@_) > 1 ); 
+
 	return bless {}, $class;
 }
 
@@ -26,8 +28,9 @@ sub set {
 	confess "$value not a valid object type for a property"
 	  unless ( $value->can('equals') 
 	  			&& $value->can('contains')
-	  			&& $value->can('intersects') );
-
+	  			&& $value->can('intersects')
+	  			&& $value->can('as_string') );
+ 
 	$self->{$key} = $value;
 }
 
@@ -79,7 +82,7 @@ sub matches {
 			if ( !defined( $self->{$key} ) ) {
 				return undef;
 			}
-			if ( ! $self->{$key}->equals($other->{$key} ) ) {
+			if ( ! $self->{$key}->equals( $other->{$key} ) ) {
 				return undef;
 			}
 		}
@@ -143,16 +146,12 @@ sub contained_by {
 
 sub clone {
 	my ($self) = @_;
-	my $clone = __PACKAGE__->new();
-	foreach my $key ( keys %$self ) {
-		$clone->{$key} = $self->{$key};
-	}
-	return $clone;
+	my %clone = %$self;
+	return bless( \%clone, ref $self ) ;
 }
 
 sub as_string {
 	my ($self) = @_;
-	#carp "called as_string on Object::KVC::Hash";
 	my $string;
 	foreach my $key  ( sort keys %$self ) {
 		$string .= $key . " => " . $self->get($key) . " ";
@@ -164,7 +163,7 @@ sub dump {
 	my ($self) = @_;
 	my $string;
 	foreach my $key  ( sort keys %$self ) {
-		$string .= $key . " => " . $self->get($key) . "\n";
+		$string .= $key . " => " . ref( $self->get($key) ) . " " . $self->get($key)->as_string() . "\n";
 	}
 	return $string;
 
@@ -200,8 +199,10 @@ a variety of objects without having to write a large number
 of classes.
 
 Values must be wrapped in an object supporting the "equals,"
-"contains," and "intersects" methods in order to allow two 
-Object::KVC::Hash objects to be compared.
+"contains," "intersects," and "as_string" methods.
+
+The "equals," "contains," and "intersects," methods allow
+two Object::KVC::Hash object properties to be compared.
 
 The "equals," "contains," and "intersects" methods allow searching
 of Object::KVC::Hash objects within an Object::KVC::List.
@@ -231,9 +232,14 @@ Set a key value pair.
 
   $object->set( "key",  Object::KVC::String->new("string") );
 
+Set throws an exception if the value object does not support
+the required methods.
+
 Same as:
 
   $object->{ "key" } = Object::KVC::String->new("string");
+
+Without type checking.
 
 =head2 get( <string> )
 
@@ -241,9 +247,58 @@ Get a value object.
 
   my $value = $object->get( "key" );
 
+Throws an exception if the specified key if not defined.
+
 Same as:
 
   my $value = $object->{"key"};
+
+Without checking that the key is defined.
+
+=head2 equals( $other<Object::KVC::Hash> )
+
+Returns true if all keys exist in both objects and the
+corresponding value objects are equal.
+
+  $object1->equals( $object2 );
+  
+=head2 matches( $other<Object::KVC::Hash> )
+
+Returns true if all keys in $object2 exist in $object1 and the
+corresponding value objects are equal.
+
+Returns false if $object2 has a key which does not exist in $object1.
+
+  $object1->matches( $object2 );
+
+=head2 intersects( $other<Object::KVC::Hash> )
+
+Returns true if all keys in $object2 exist in $object1 and the
+corresponding value objects intersect.
+
+Returns false if $object2 has a key which does not exist in $object1.
+
+  $object1->intersects( $object2 );
+
+=head2 contains( $other<Object::KVC::Hash> )
+
+Returns true if all keys in $object2 exist in $object1 and the
+corresponding value objects in $object1 contain the corresponding 
+value objects in $object2.
+
+Returns false if $object2 has a key which does not exist in $object1.
+
+  $object1->contains( $object2 );
+
+=head2 contained_by( $other<Object::KVC::Hash> )
+
+Returns true if all keys in $object2 exist in $object1 and the
+corresponding value objects in $object2 contain the corresponding 
+value objects in $object1.
+
+Returns false if $object2 has a key which does not exist in $object1.
+
+  $object1->contained_by( $object2 );
 
 =head2 get_keys()
 
@@ -274,51 +329,6 @@ Delete a key value pair.
 Same as.
 
   delete( $object->{"key"} );
-
-=head2 equals( <Object::KVC::Hash> )
-
-Returns true if all keys exist in both objects and the
-corresponding value objects are equal.
-
-  $object1->equals( $object2 );
-  
-=head2 matches( <Object::KVC::Hash> )
-
-Returns true if all keys in $object2 exist in $object1 and the
-corresponding value objects are equal.
-
-Returns false if $object2 has a key which does not exist in $object1.
-
-  $object1->matches( $object2 );
-
-=head2 intersects( <Object::KVC::Hash> )
-
-Returns true if all keys in $object2 exist in $object1 and the
-corresponding value objects intersect.
-
-Returns false if $object2 has a key which does not exist in $object1.
-
-  $object1->intersects( $object2 );
-
-=head2 contains( <Object::KVC::Hash> )
-
-Returns true if all keys in $object2 exist in $object1 and the
-corresponding value objects in $object1 contain the corresponding 
-value objects in $object2.
-
-Returns false if $object2 has a key which does not exist in $object1.
-
-  $object1->contains( $object2 );
-
-=head2 contained_by( <Object::KVC::Hash> )
-
-Returns true if all keys in $object2 exist in $object1 and the
-corresponding value objects in $object2 contain the corresponding 
-value objects in $object1.
-
-Returns false if $object2 has a key which does not exist in $object1.
-
-  $object1->contained_by( $object2 );
 
 =head2 as_string()
 

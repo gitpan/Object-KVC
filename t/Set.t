@@ -1,16 +1,23 @@
 use strict;
 use warnings;
 
-use Test::Simple tests => 12;
+use Test::Simple tests => 13;
 
 use Object::KVC::Set;
+use Object::KVC::Hash;
 use Object::KVC::String;
 
-my $s1 = Object::KVC::String->new("10.1.2.3");
-my $s2 = Object::KVC::String->new("10.1.2.3");
-my $s3 = Object::KVC::String->new("10.1.1.3");
-my $s4 = Object::KVC::String->new("10.1.3.3");
-my $s5 = Object::KVC::String->new("10.1.3.4");
+my $s1 = Object::KVC::Hash->new();
+my $s2 = Object::KVC::Hash->new();
+my $s3 = Object::KVC::Hash->new();
+my $s4 = Object::KVC::Hash->new();
+my $s5 = Object::KVC::Hash->new();
+
+$s1->set( "OBJECT", Object::KVC::String->new("10.1.2.3") );
+$s2->set( "OBJECT", Object::KVC::String->new("10.1.2.3") );
+$s3->set( "OBJECT", Object::KVC::String->new("10.1.1.3") );
+$s4->set( "OBJECT", Object::KVC::String->new("10.1.3.3") );
+$s5->set( "OBJECT", Object::KVC::String->new("10.1.3.4") );
 
 ok( $s1->equals($s2), "equals" );
 
@@ -32,8 +39,6 @@ ok( !$set1->contains($set2), "!contains - Set" );
 
 ok( !$set1->equals($s1), "!equals - object" );
 
-ok( $set2->includes($s1), "includes" );
-
 my $union = $set1->union($set2);
 
 ok( $union->equals($set2), "union" );
@@ -53,4 +58,12 @@ $set3->add($s5);
 
 ok( $set1->disjoint($set3), "disjoint" );
 
-ok( $set3->size() == 2, "size" );
+$set3->add($s2);
+$set3->add($s3);
+
+ok( $set3->size() == 4, "size" );
+
+ok( $set3->includes($s2), "includes string" );
+
+ok( $set3->includes($set2), "includes set" );
+

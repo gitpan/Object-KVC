@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub new {
 	my ( $class, $string ) = @_;
@@ -13,15 +13,12 @@ sub new {
 	confess "string required"
 	  unless defined($string);
 
-	$string =~ s/^\s+|\s+$//;
+	$string =~ s/^\s+|\s+$//g;
 
-	my $self = { STRING => $string };
-	bless( $self, $class );
-
-	return $self;
+	return bless( \$string, $class );
 }
 
-sub as_string { return $_[0]->{STRING}; }
+sub as_string { return ${$_[0]} }
 
 sub equals {
 	my ( $self, $other ) = @_;
@@ -66,11 +63,11 @@ in an Object::KVC::Hash object.
 
 =head1 METHODS
 
-=head2 new()
+=head2 new( 'string' )
 
 The constructor.
 
-   my $object = Object::KVC::String->new( "string" );
+   my $string = Object::KVC::String->new( "string" );
 
 String to be wrapped must be provided as an argument. Leading and trailing
 whitespace is stripped.

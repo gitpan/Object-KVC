@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::Simple tests => 12;
+use Test::Simple tests => 16;
 
 use Object::KVC::Hash;
 use Object::KVC::String;
@@ -50,3 +50,28 @@ ok ( !$ce->contains($search), "!contains");
 ok ( !$ce->contains("a string"), "!contains other type");
 
 ok ( $search->intersects($ce), "intersects");
+
+
+my $ce1 = Object::KVC::Hash->new();
+my $ce2 = Object::KVC::Hash->new();
+my $ce3 = Object::KVC::Hash->new();
+my $ce4 = Object::KVC::Hash->new();
+
+$ce1->set( "S1", Object::KVC::String->new("string11") );
+$ce1->set( "D1", Object::KVC::String->new("string12") );
+
+$ce2->set( "D1", Object::KVC::String->new("string32") );
+
+$ce3->set( "S1", Object::KVC::String->new("string31") );
+$ce3->set( "D1", Object::KVC::String->new("string32") );
+
+$ce4->set( "S1", Object::KVC::String->new("string31") );
+$ce4->set( "D1", Object::KVC::String->new("string32") );
+
+ok ( ! $ce4->intersects($ce1), "!intersects" );
+
+ok ( $ce3->intersects($ce2), "intersects" );
+
+ok ( $ce3->intersects($ce4), "!intersects" );
+
+ok ( $ce3->intersects($ce4), "!intersects" );
